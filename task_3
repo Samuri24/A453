@@ -33,7 +33,7 @@ Module Module1
                 reg = reg.ToUpper() 'changes the registration plate entered by the user to uppercase in order to check against the regex string
                 Dim match As Match = check.Match(reg) 'The variable which will be used to check if the regex statement matches the reg entered
 
-                If speed2 > limit And match.Success Then 'Compares the rounded speed to 'limit' and matches the regex
+                If speed2 > limit And match.Success = True Then 'Compares the rounded speed to 'limit' and matches the regex
                     Dim reader As New StreamReader("P:\dataTable.csv") 'Opens the rader which will read the lines from the data file
 
                     While reader.Peek <> -1 'Loops if there are still unread lines in the csv file
@@ -48,14 +48,25 @@ Module Module1
 
                         Dim tempMatch As Match = tempReg.Match(spltArr(0)) 'The variable which will be used to check if the registration matches the reg of the line currently being read
                         If tempMatch.Success Then 'If the reg matches the one being read...
+
                             Console.ForegroundColor = ConsoleColor.Red 'Sets the console foreground colour to red
                             Console.WriteLine("SPEEDING!") 'Prints to the console that the vehicle is speeding
                             Console.ForegroundColor = ConsoleColor.White 'Sets the console foreground colour to white
+
                             Dim listWriter As String = "" 'Dimensions a variable which will be used to 'stitch together' the split line
-                            listWriter = spltArr(0) & " was travelling: " & speed2 - 60 & " mph over the speed limt (60 mph) and belongs to " & spltArr(1) & " " & spltArr(2) & " of " & _
+                            listWriter = spltArr(0) & " was travelling: " & speed2 - limit & " mph over the speed limt (60 mph) and belongs to " & spltArr(1) & " " & spltArr(2) & " of " & _
                             spltArr(3) & ", " & spltArr(4) & ", " & spltArr(5) & ", " & spltArr(6) & ", " & spltArr(7) & ", " & spltArr(8)
                             'Assigns 'listWriter' the string which will be written to the file
                             list.Add(listWriter) 'Adds the value of 'listWriter' to the list which will be written to the file.
+
+                        ElseIf speed > limit And match.Success = False Then 'If the vehicle is speeding but is not on the list of vehicles
+                            Console.WriteLine("Speeding by " & speed - limit & " mph, but registration does not feature on list.") 'Prints the contents of the brackets
+
+                        ElseIf speed < limit And match.Success = True Then 'If the vehicle is not speeding but features on the list
+                            Console.WriteLine("Vehicle veatures on the list but is not speeding") 'Prints the contents of the brackets
+
+                        Else 'If no conditions are met
+                            Console.WriteLine("Vehicle does not feature on the list, nor is it speeding") 'Prints the contents of the brackets
                         End If
 
                     End While
